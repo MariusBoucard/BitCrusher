@@ -53,9 +53,9 @@
 #pragma once
 #include <JuceHeader.h>
 #include "dsp/RecursiveLinearFilter.h"
-//#include <juce_dsp/juce_dsp.h>
+#include <random>
 //==============================================================================
-class GainProcessor final : public AudioProcessor
+class GainProcessor final : public AudioProcessor, public AudioProcessorParameter::Listener
 {
 public:
 
@@ -63,12 +63,16 @@ public:
     GainProcessor()
         : AudioProcessor (BusesProperties().withInput  ("Input",  AudioChannelSet::stereo())
                                            .withOutput ("Output", AudioChannelSet::stereo()))
+        , mDistribution_noise(-1.0f, 1.0f)
+        , dist(5.f)
     {
+
+
         addParameter (gain = new AudioParameterFloat ({ "gain", 1 }, "Gain", 0.0f, 1.0f, 0.5f));
         addParameter(pBitDepth = new AudioParameterInt("bitDepth", "bitDepth", 1,16,16));
         addParameter(pSampleRate = new AudioParameterInt("sampleRate", "SampleRate", 1, 96000, 44100));
 
-        addParameter(pSampleRateAlgoChoice = new AudioParameterChoice("satAlgo", "Saturation Algorithm", { "Soft Clip", "Hard Clip", "Much More" }, 1));
+        addParameter(pSampleRateAlgoChoice = new AudioParameterChoice("satAlgo", "Saturation Algorithm", { "Soft Clip", "Hard Clip", "Wave shaping", "Polynomial saturation", "Tanh", "ArctanH"}, 1));
         addParameter(pGainSat = new AudioParameterFloat("gainSat", "Saturation gain", -12, 12, 0));
         addParameter(pSatMix = new AudioParameterFloat("mixSat", "Saturation mix", 0.f, 100.f, 100.f));
 
@@ -78,13 +82,35 @@ public:
 
         addParameter(pMix = new AudioParameterFloat("mix", "Mix", 0.f, 100.f, 100.f));
 
-        // Use a threshold on the signal and hash it ?
-        AudioParameterFloat* pRadiationsFrequence;
-        AudioParameterFloat* pRadiationLength;
+        addParameter(pRadiationAmplitude = new AudioParameterFloat("radiationAmplitude", "Radiation Amplitude", 0.f, 1.f, 0.5f));
+        addParameter(pRadiationsFrequence = new AudioParameterFloat("radiationFrequency", "Radiation Frequency", 0.1f, 50.f, 0.5f));
+        addParameter(pRadiationLength = new AudioParameterFloat("radiationLength", "Radiation Length", 0.f, 1.f, 0.5f));
+        pRadiationsFrequence->addListener(this);
+        pRadiationLength->addListener(this);
+        pRadiationAmplitude->addListener(this);
 
 
     }
 
+    ~GainProcessor() override
+    {
+        for (int channel = 0; channel < 2; ++channel)
+        {
+			delete[] mFloatBuffer[channel];
+			delete[] mTempFloatBuffer[channel];
+			delete[] mDoubleBuffer[channel];
+			delete[] mTempDoubleBuffer[channel];
+			delete[] mVerbDoubleBuffer[channel];
+		}
+		delete[] mFloatBuffer;
+		delete[] mTempFloatBuffer;
+		delete[] mDoubleBuffer;
+		delete[] mTempDoubleBuffer;
+		delete[] mVerbDoubleBuffer;
+        pRadiationsFrequence->removeListener(this);
+        pRadiationLength->removeListener(this);
+        pRadiationAmplitude->removeListener(this);
+    }
 
     //==============================================================================
     void prepareToPlay (double, int) override {
@@ -223,9 +249,43 @@ public:
             }
         }
 
+
+        for (int s = 0; s < numSamples; ++s)
+        {
+            if (nextImpulseSample <= 0)
+            {
+                // Génération d'un clic bruité sur plusieurs samples
+                for (int k = 0; k < mGeigerLengthSample; ++k)
+                {
+                    int sampleIndex = s + k;
+                    if (sampleIndex < numSamples)
+                    {
+                        // Générer un bruit blanc léger UNE SEULE FOIS
+                        float noise = mDistribution_noise(rng); // distribution entre -1.0f et 1.0f
+                        float envelope = std::exp(-3.0f * static_cast<float>(k) / static_cast<float>(mGeigerLengthSample));
+                        float impulseValue = noise * envelope * pRadiationAmplitude->get();
+
+                        // Copier le même bruit dans tous les channels
+                        for (int channel = 0; channel < numChannels; ++channel)
+                        {
+                            mTempDoubleBuffer[channel][sampleIndex] += impulseValue;
+                        }
+                    }
+                }
+
+                // Préparer le prochain événement
+                float secondsToNext = dist(rng);
+                nextImpulseSample = static_cast<int>(secondsToNext * sampleRate);
+            }
+            else
+            {
+                nextImpulseSample--;
+            }
+        }
+
         for (int channel = 0; channel < isMono; ++channel)
         {
-            std::transform(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
+            std::transform(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
                         return static_cast<float>(sample);
                         });
         }
@@ -253,7 +313,20 @@ public:
     void setCurrentProgram (int) override                  {}
     const String getProgramName (int) override             { return "None"; }
     void changeProgramName (int, const String&) override   {}
+    void parameterValueChanged(int parameterIndex, float newValue) override
+    {
+        if (parameterIndex == pRadiationLength->getParameterIndex())
+        {
+			mGeigerLengthSample = static_cast<int>(newValue * getSampleRate());
+		}
+        if (parameterIndex == pRadiationsFrequence->getParameterIndex())
+        {
+            float realValue = pRadiationsFrequence->range.start + newValue * (pRadiationsFrequence->range.end - pRadiationsFrequence->range.start);
+            dist = std::exponential_distribution<float>(realValue);
+        }
 
+    };
+    void parameterGestureChanged(int, bool) override {}
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
@@ -290,12 +363,16 @@ private:
     AudioParameterFloat* pSatBellFreq;
     AudioParameterFloat* pSatBellGain;
     AudioParameterFloat* pSatBellQ;
-    recursive_linear_filter::Peaking mBellFilter;
 
+    recursive_linear_filter::Peaking mBellFilter;
+    std::uniform_real_distribution<float> mDistribution_noise;
 
     // Use a threshold on the signal and hash it ?
     AudioParameterFloat* pRadiationsFrequence;
     AudioParameterFloat* pRadiationLength;
+    AudioParameterFloat* pRadiationAmplitude;
+
+    int mGeigerLengthSample = 44100;
 
 
     float** mFloatBuffer = nullptr;
@@ -305,6 +382,10 @@ private:
     double** mTempDoubleBuffer = nullptr;
     double** mVerbDoubleBuffer = nullptr;
 
+    std::mt19937 rng;
+    std::exponential_distribution<float> dist;
+    float sampleRate;
+    int nextImpulseSample;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainProcessor)
 };
