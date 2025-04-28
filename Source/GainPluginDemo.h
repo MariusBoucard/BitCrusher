@@ -52,7 +52,8 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include <juce_dsp/juce_dsp.h>
+#include "dsp/RecursiveLinearFilter.h"
+//#include <juce_dsp/juce_dsp.h>
 //==============================================================================
 class GainProcessor final : public AudioProcessor
 {
@@ -67,8 +68,7 @@ public:
         addParameter(pBitDepth = new AudioParameterInt("bitDepth", "bitDepth", 1,16,16));
         addParameter(pSampleRate = new AudioParameterInt("sampleRate", "SampleRate", 1, 96000, 44100));
 
-        addParameter(pSampleRateAlgoChoice = new AudioParameterChoice("downsampleAlgo", "Downsample Algorithm", { "min", "max", "rms" }, 1));
-
+        addParameter(pSampleRateAlgoChoice = new AudioParameterChoice("satAlgo", "Saturation Algorithm", { "Soft Clip", "Hard Clip", "Much More" }, 1));
         addParameter(pGainSat = new AudioParameterFloat("gainSat", "Saturation gain", -12, 12, 0));
         addParameter(pSatMix = new AudioParameterFloat("mixSat", "Saturation mix", 0.f, 100.f, 100.f));
 
@@ -88,15 +88,28 @@ public:
 
     //==============================================================================
     void prepareToPlay (double, int) override {
-       auto sampleRate = getSampleRate();
-       auto coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, pSatBellFreq->get(), pSatBellQ->get(), juce::Decibels::decibelsToGain(pSatBellGain->get()));
-       mBellFilter.coefficients = coefficients;
+
+
     }
 
     void releaseResources() override {}
 
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
     {
+
+        // MAppers
+        auto gain = pSatBellGain->get();
+        auto freq = pSatBellFreq->get();
+        auto q = pSatBellQ->get();
+
+        const double sampleRate = getSampleRate();
+        const double midGainDB = gain; // +/- 10
+        const double midFrequency = freq;
+        const double midQuality = q;
+        recursive_linear_filter::BiquadParams midParams(sampleRate, midFrequency, midQuality, midGainDB);
+
+        mBellFilter.SetParams(midParams);
+
         int isMono = 2;
 
         const int numChannels = buffer.getNumChannels();
@@ -139,13 +152,14 @@ public:
         }
 
         // Bit Depth
+        const int targetBitDepth = pBitDepth->get(); // Desired bit depth
+        const int numLevels = 1 << targetBitDepth;   // Number of discrete levels (2^bitDepth)
+        const double stepSize = 2.0 / numLevels;    // Step size between levels
         for (int channel = 0; channel < isMono; ++channel)
         {
             for (int sample = 0; sample < numSamples; ++sample)
             {
-                const int targetBitDepth = pBitDepth->get(); // Change this to your desired bit depth
-                const double maxAmplitude = std::pow(2.0, targetBitDepth - 1) - 1;
-                mTempDoubleBuffer[channel][sample] = std::round(mDoubleBuffer[channel][sample] * maxAmplitude) / maxAmplitude;
+                mTempDoubleBuffer[channel][sample] = std::round(mDoubleBuffer[channel][sample] / stepSize) * stepSize;
             }
         }
 
@@ -153,104 +167,61 @@ public:
 
         for (int channel = 0; channel < isMono; ++channel)
         {
-            // Need a buffer
             float numOfSamplesForOneValue = getSampleRate() / pSampleRate->get();
-            numOfSamplesForOneValue > numSamples ? numOfSamplesForOneValue = numSamples : numOfSamplesForOneValue = numOfSamplesForOneValue;
-            int minS = int(numOfSamplesForOneValue);
-            // To be move for continuity for all arrays
-            int channelSign = -1;
-            int processedSamples = 0;
-            if (numSamples - processedSamples > minS)
+            int stepSize = static_cast<int>(numOfSamplesForOneValue); // Step size for downsampling
+
+            for (int sample = 0; sample < numSamples; sample += stepSize)
             {
-                double absMaxSaw = -100;
-                for (int s = 0; s < minS; s++)
+                // Take the first sample in the group (or apply a filter for better quality)
+                double downsampledValue = mTempDoubleBuffer[channel][sample];
+
+                // Fill the group with the downsampled value
+                for (int s = 0; s < stepSize && (sample + s) < numSamples; ++s)
                 {
-                    abs(mTempDoubleBuffer[channel][s])> absMaxSaw ? absMaxSaw = abs(mTempDoubleBuffer[channel][s]) : absMaxSaw = absMaxSaw ;
-                }
-                for (int s = 0; s < minS; s++)
-                {
-                    mDoubleBuffer[channel][s] = absMaxSaw;
+                    mDoubleBuffer[channel][sample + s] = downsampledValue;
                 }
             }
-            else
-            {
-                // Partial value fuck it
-                double absMaxSaw = -100;
-                for (int s = 0; s < numSamples - processedSamples; s++)
-                {
-                    abs(mTempDoubleBuffer[channel][s]) > absMaxSaw ? absMaxSaw = abs(mTempDoubleBuffer[channel][s]) : absMaxSaw = absMaxSaw;
-                }
-                for (int s = 0; s < minS; s++)
-                {
-                    mDoubleBuffer[channel][s] = absMaxSaw;
-                }
-            }
-   
         }
 
-        // BIFBOF
-        auto coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), pSatBellFreq->get(), pSatBellQ->get(), juce::Decibels::decibelsToGain(pSatBellGain->get()));
-        mBellFilter.coefficients = coefficients;
-        // Put float so carefull with buffer 
-        
-        for (int channel = 0; channel < numChannels; channel++)
+        // ADD the bell using AUdioDSPTools
+        mTempDoubleBuffer = mBellFilter.Process(mDoubleBuffer, numChannels, numSamples);
+
+        // Saturation 
+        for (int channel = 0; channel < isMono; ++channel)
+        {
+            const float inputGainDb = pGainSat->get(); // Adjust this value as needed
+            const double inputGainLinear = std::pow(10.0, inputGainDb / 20.0); // Convert dB to linear scale
+            std::transform(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mDoubleBuffer[channel],
+                [inputGainLinear](double sample) {
+                    sample *= inputGainLinear;
+                      // Smooth buffy in lows 
+    //                // sample = std::tanh(sample);
+    //                // sample = std::atan(sample); // Arctangent saturation
+    //                // sample = std::sin(sample); // Sine wave saturation
+    //                // sample = sample - (1.5 * std::pow(sample, 3)); // Polynomial saturation
+    //                // sample = sample / (1.0 + std::abs(sample * 2.0)); // Wave shaping
+    //        // 
+    //                // HARD CLIP -> way more agressive
+                    {
+                        const double threshold = 0.8; // Clipping threshold
+                        if (sample > threshold) sample = threshold;
+                        else if (sample < -threshold) sample = -threshold;
+                    }
+                    sample /= inputGainLinear;
+
+                    return sample;
+                });
+        }
+
+        // Sat mix
+        float mix = pSatMix->get();
+        for (int channel = 0; channel < isMono; channel++)
         {
             for (int s = 0; s < numSamples; s++)
             {
-                mFloatBuffer[0][s] = mDoubleBuffer[channel][s];
+                mDoubleBuffer[channel][s] = (mDoubleBuffer[channel][s] * (mix) + mTempDoubleBuffer[channel][s] * (100-mix)) * 0.01; // Carefull who get the mix
             }
-
-            juce::dsp::AudioBlock<float> audioBlock(mFloatBuffer, 1, static_cast<size_t>(numSamples));
-
-            juce::dsp::ProcessContextReplacing<float> context(audioBlock);
-
-            mBellFilter.process(context);
-
-            for (int s = 0; s < numSamples; s++)
-            {
-                mDoubleBuffer[channel][s] = mFloatBuffer[0][s];
-            }
-
         }
-        // Saturation 
-        //for (int channel = 0; channel < isMono; ++channel)
-        //{
-        //    const float inputGainDb = pGainSat->get(); // Adjust this value as needed
-        //    const double inputGainLinear = std::pow(10.0, inputGainDb / 20.0); // Convert dB to linear scale
-
-
-        //    std::transform(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempDoubleBuffer[channel],
-        //        [inputGainLinear](double sample) {
-        //            sample *= inputGainLinear;
-
-        //            // Smooth buffy in lows
-        //            // sample = std::tanh(sample);
-        //            // sample = std::atan(sample); // Arctangent saturation
-        //            // sample = std::sin(sample); // Sine wave saturation
-        //            // sample = sample - (1.5 * std::pow(sample, 3)); // Polynomial saturation
-        //            // sample = sample / (1.0 + std::abs(sample * 2.0)); // Wave shaping
-        //    // 
-        //            // HARD CLIP -> way more agressive
-        //            const double threshold = 0.8; // Clipping threshold
-        //            if (sample > threshold) sample = threshold;
-        //            else if (sample < -threshold) sample = -threshold;
-        //            //
-
-        //            sample /= inputGainLinear;
-
-        //            return sample;
-        //        });
-        //}
-
-        // Sat mix
-        //float mix = pSatMix->get();
-        //for (int channel = 0; channel < isMono; channel++)
-        //{
-        //    for (int s = 0; s < numSamples; s++)
-        //    {
-        //        mDoubleBuffer[channel][s] = (mDoubleBuffer[channel][s] * (100-mix) + mTempDoubleBuffer[channel][s] * mix) * 0.01; // Get back between 0 and 1
-        //    }
-        //}
 
         for (int channel = 0; channel < isMono; ++channel)
         {
@@ -258,19 +229,13 @@ public:
                         return static_cast<float>(sample);
                         });
         }
-  /*      for (int channel = 0; channel < isMono; ++channel)
+
+        for (int channel = 0; channel < isMono; ++channel)
         {
             auto* floatData = buffer.getWritePointer(channel);
             std::copy(mTempFloatBuffer[channel], mTempFloatBuffer[channel] + numSamples, floatData);
-        }*/
-
-
+        }
     }
-
-    //void processBlock (AudioBuffer<double>& buffer, MidiBuffer&) override
-    //{
-    //    buffer.applyGain ((float) *gain);
-    //}
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override          { return new GenericAudioProcessorEditor (*this); }
@@ -299,18 +264,7 @@ public:
     {
         gain->setValueNotifyingHost (MemoryInputStream (data, static_cast<size_t> (sizeInBytes), false).readFloat());
     }
-    void parameterChanged(const juce::String& parameterID, float newValue)
-    {
-        if (parameterID == "satBellFreq" || parameterID == "satBellGain" || parameterID == "satBellQ")
-        {
-            float frequency = pSatBellFreq->get();
-            float gain = juce::Decibels::decibelsToGain(pSatBellGain->get());
-            float q = pSatBellQ->get();
 
-            auto coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), frequency, q, gain);
-            *mBellFilter.coefficients = *coefficients;
-        }
-    }
 
     //==============================================================================
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override
@@ -336,7 +290,8 @@ private:
     AudioParameterFloat* pSatBellFreq;
     AudioParameterFloat* pSatBellGain;
     AudioParameterFloat* pSatBellQ;
-    juce::dsp::IIR::Filter<float> mBellFilter;
+    recursive_linear_filter::Peaking mBellFilter;
+
 
     // Use a threshold on the signal and hash it ?
     AudioParameterFloat* pRadiationsFrequence;
