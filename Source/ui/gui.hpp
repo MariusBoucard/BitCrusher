@@ -26,8 +26,8 @@ void RootViewComponent::defineKnobLayout()
 
     mRightSectionLayout.inLayout.x = 1400;
     mRightSectionLayout.inLayout.y = 200;
-    mRightSectionLayout.inLayout.frameWidth = 400;
-    mRightSectionLayout.inLayout.frameHeight = 500;
+    mRightSectionLayout.inLayout.frameWidth = 500;
+    mRightSectionLayout.inLayout.frameHeight = 1000;
     mRightSectionLayout.inLayout.ratio = 1.f;
 
   

@@ -99,6 +99,9 @@ private:
     dsp::tone_stack::AbstractToneStack* mToneStack;
 
 
+    recursive_linear_filter::Peaking mBellFilter;
+    std::uniform_real_distribution<float> mDistribution_noise;
+
     float** mFloatBuffer = nullptr;
     float** mTempFloatBuffer = nullptr;
 
