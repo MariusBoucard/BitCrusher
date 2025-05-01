@@ -69,7 +69,90 @@ jucer_project_files("GainPlugin/Source"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
   x         .         .         "Source/Main.cpp"
-  .         .         .         "Source/GainPluginDemo.h"
+  x         .         .         "Source/GainPluginDemo.h"
+  x         .         .         "Source/AmpAudioProcessor.cpp"
+  x         .         .         "Source/AmpAudioProcessor.h"
+  x         .         .         "Source/AmpAudioProcessor.hpp"
+)
+
+jucer_project_files("GainPlugin/Source/dsp"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/dsp/Mappers.cpp"
+  x         .         .         "Source/dsp/Mappers.h"
+  x         .         .         "Source/dsp/ParameterSetup.h"
+  x         .         .         "Source/dsp/Processor.cpp"
+  x         .         .         "Source/dsp/Processor.h"
+  x         .         .         "Source/dsp/Processor.hpp"
+)
+
+jucer_project_files("GainPlugin/Source/dsp/Bones"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/dsp/Bones/ToneStack.cpp"
+  x         .         .         "Source/dsp/Bones/ToneStack.h"
+)
+
+jucer_project_files("GainPlugin/Source/looknfeel"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/looknfeel/GeneralLookAndFeel.h"
+  x         .         .         "Source/looknfeel/StripKnob_look_n_feel.h"
+  x         .         .         "Source/looknfeel/ToogleButtonLookAndFeel.h"
+  x         .         .         "Source/looknfeel/TopBarLookAndFeel.h"
+)
+
+jucer_project_files("GainPlugin/Source/ui"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/ui/gui.cpp"
+  x         .         .         "Source/ui/gui.h"
+  x         .         .         "Source/ui/gui.hpp"
+)
+
+jucer_project_files("GainPlugin/Source/ui/components"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/ui/components/TopBarComponent.cpp"
+  x         .         .         "Source/ui/components/TopBarComponent.h"
+)
+
+
+
+
+
+jucer_project_files("GainPlugin/ressources/knob/Geiger"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         x         x         "Source/ressources/knob/Geiger/g2.png"
+)
+
+jucer_project_files("GainPlugin/ressources/knob/knob"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         x         x         "Source/ressources/knob/knob/bit.png"
+  .         x         x         "Source/ressources/knob/knob/sr.png"
+)
+
+jucer_project_files("GainPlugin/ressources/plate"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         x         x         "Source/ressources/plate/plate.png"
+  # Add more files here if needed
+)
+
+jucer_project_files("GainPlugin/ressources/knob/sat"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         x         x         "Source/ressources/knob/sat/Mix.png"
+  .         x         x         "Source/ressources/knob/sat/SatBF.png"
+  .         x         x         "Source/ressources/knob/sat/SatBQ.png"
+
+  .         x         x         "Source/ressources/knob/sat/SatG.png"
+
+  .         x         x         "Source/ressources/knob/sat/SatGain.png"
+  .         x         x         "Source/ressources/knob/sat/SatMix.png"
+  .         x         x         "Source/ressources/knob/sat/SatM.png"
 )
 
 jucer_project_module(
