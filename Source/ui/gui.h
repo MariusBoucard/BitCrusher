@@ -3,6 +3,7 @@
 #include "../looknfeel/ToogleButtonLookAndFeel.h"
 #include "../looknfeel/TopBarLookAndFeel.h"
 #include "components/TopBarComponent.h"
+#include "components/leftSection/leftComponent.h"
 #include <JuceHeader.h>
 
 class RootViewComponent : public juce::AudioProcessorEditor
@@ -39,12 +40,8 @@ public:
 	    inKnobLayout.outLayout.x = inKnobLayout.inLayout.x;
         inKnobLayout.outLayout.y = inKnobLayout.inLayout.y;
         inKnobLayout.outLayout.sliderWidth = inKnobLayout.inLayout.frameWidth * inKnobLayout.inLayout.ratio;
-        inKnobLayout.outLayout.sliderHeight = (inKnobLayout.inLayout.frameHeight + inKnobLayout.inLayout.textboxHeight + 10) * inKnobLayout.inLayout.ratio;
+        inKnobLayout.outLayout.sliderHeight = inKnobLayout.inLayout.frameHeight * inKnobLayout.inLayout.ratio;
 	}
-
-    void handleSelectedFile(const juce::File& file);
-    void handleSelectedNAMFile(const juce::File& file);
-    void handleSelectedVerbIRFile(const juce::File& file);
 
     void updatePath();
     void paint(juce::Graphics& g) override;
@@ -75,71 +72,23 @@ public:
 
 private:
     juce::Image mImage;
-    MeterComponent mInputMeter;
-    KnobLayout mInputMeterLayout;
 
-    MeterComponent mOutputMeter;
-	KnobLayout mOutputMeterLayout;
+    juce::AudioProcessor& mProcessor;
 
-    juce::Slider mInputKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mInputAttachment;
-    KnobLayout mInputKnobLayout;
-
-    juce::Slider mGateKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mGateKnobAttachment;
-    KnobLayout mGateKnobLayout;
-
-    juce::Slider mBassKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mBassKnobAttachment;
-    KnobLayout mBassKnobLayout;
+    
+    //MeterComponent mInputMeter;
+    //KnobLayout mInputMeterLayout;
 
     juce::Slider mMidKnob;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mMidKnobAttachment;
     KnobLayout mMidKnobLayout;
 
-    juce::Slider mHighKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mHighKnobAttachment;
-    KnobLayout mHighKnobLayout;
-
-    juce::Slider mOutputKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mOutputKnobAttachment;
-    KnobLayout mOutputKnobLayout;
-
-    juce::Slider mVerbMixKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mVerbMixKnobAttachment;
-    KnobLayout mVerbMixKnobLayout;
-
-    juce::ToggleButton mIRButton;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mIRButtonAttachment;
-    KnobLayout mIRButtonLayout;
-
-    juce::ToggleButton mIRVerbButton;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mIRVerbButtonAttachment;
-    KnobLayout mIRVerbButtonLayout;
-
-    juce::ToggleButton mNAMButton;
-	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mNAMButtonAttachment;
-    KnobLayout mNAMButtonLayout;
-
-    juce::ComboBox mFileChooserButton;
-    KnobLayout mFileChooserButtonLayout;
-
-    KnobLayout mNAMChooserButtonLayout;
-    juce::ComboBox mNAMChooserButton;
-
-    juce::ComboBox mVerbDropDown;
-    KnobLayout mVerbDropDownLayout;
-
-    juce::OwnedArray<juce::File> mIRFileList;
-    juce::OwnedArray<juce::File> mNAMFileList;
-    juce::OwnedArray<juce::File> mVerbFileList;
-
+    LeftSection mLeftSection;
+    KnobLayout mLeftSectionLayout;
 
     TopBarComponent mTopBar;
 
     KnobLayout mTopBarLayout;
-
-    juce::FileChooser mFileChooser;
 
     KnobLookAndFeel mKnobLookAndFeel; 
     DropDownLookAndFeel mDropDownLookAndFeel; 

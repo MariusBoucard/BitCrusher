@@ -78,7 +78,7 @@ public:
     }
     bool hasEditor() const override                        { return true;   }
 
-    const String getName() const override                  { return "Ballzzy's NAM"; }
+    const String getName() const override                  { return "Radiator"; }
     bool acceptsMidi() const override                      { return false; }
     bool producesMidi() const override                     { return false; }
     double getTailLengthSeconds() const override           { return 0; }
@@ -96,7 +96,6 @@ public:
         mParameters.state.writeToStream(stream);  
     }
 
-    juce::File AmpAudioProcessor::createJucePathFromFile(const juce::String& filePath);
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {

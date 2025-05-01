@@ -117,6 +117,13 @@ jucer_project_files("GainPlugin/Source/ui/components"
   x         .         .         "Source/ui/components/TopBarComponent.h"
 )
 
+jucer_project_files("GainPlugin/Source/ui/components/leftSection"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/ui/components/leftSection/leftComponent.cpp"
+  x         .         .         "Source/ui/components/leftSection/leftComponent.h"
+)
+
 
 
 
@@ -125,6 +132,8 @@ jucer_project_files("GainPlugin/ressources/knob/Geiger"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
   .         x         x         "Source/ressources/knob/Geiger/g2.png"
+  .         x         x         "Source/ressources/knob/Geiger/g1.png"
+  .         x         x         "Source/ressources/knob/Geiger/gRad.png"
 )
 
 jucer_project_files("GainPlugin/ressources/knob/knob"
@@ -132,6 +141,7 @@ jucer_project_files("GainPlugin/ressources/knob/knob"
 #           Resource  Resource
   .         x         x         "Source/ressources/knob/knob/bit.png"
   .         x         x         "Source/ressources/knob/knob/sr.png"
+  .         x         x         "Source/ressources/knob/knob/RAD.png"
 )
 
 jucer_project_files("GainPlugin/ressources/plate"
@@ -146,12 +156,10 @@ jucer_project_files("GainPlugin/ressources/knob/sat"
 #           Resource  Resource
   .         x         x         "Source/ressources/knob/sat/Mix.png"
   .         x         x         "Source/ressources/knob/sat/SatBF.png"
+  .         x         x         "Source/ressources/knob/sat/SatBG.png"
   .         x         x         "Source/ressources/knob/sat/SatBQ.png"
 
   .         x         x         "Source/ressources/knob/sat/SatG.png"
-
-  .         x         x         "Source/ressources/knob/sat/SatGain.png"
-  .         x         x         "Source/ressources/knob/sat/SatMix.png"
   .         x         x         "Source/ressources/knob/sat/SatM.png"
 )
 

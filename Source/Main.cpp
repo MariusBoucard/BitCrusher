@@ -8,9 +8,10 @@
 
 #include <JuceHeader.h>
 #include "GainPluginDemo.h"
+#include "AmpAudioProcessor.h"
 
 //==============================================================================
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new GainProcessor();
+    return new AmpAudioProcessor();
 }

@@ -15,7 +15,13 @@ public:
         if (mKnobStrip.isNull())
             DBG("Failed to load knob strip image from resources");
     }
+    void setImage(const void* imageData, int imageDataSize)
+    {
+        mKnobStrip = juce::ImageFileFormat::loadFrom(imageData, imageDataSize);
 
+        if (mKnobStrip.isNull())
+            DBG("Failed to load image from binary data");
+    }
 
     void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
                           float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle,
@@ -25,11 +31,15 @@ public:
             return;
 
         const int numFrames = 260;
-        int column = 5;
+        int column = 10;
         const int row = numFrames / column; // Assuming the first row of the image
         const int frameIndex = (int)std::round(sliderPosProportional * (numFrames - 1)) % numFrames;
-        int frame_width = 135;
-        int frame_height = 153;
+
+        // get image width :
+        int w = mKnobStrip.getBounds().getWidth();
+        int h = mKnobStrip.getBounds().getHeight();
+        int frame_width = w / column;
+        int frame_height = h / row;
 
         int line = frameIndex / column;
         int columnIndex = frameIndex % column;
@@ -42,27 +52,10 @@ public:
 
     void drawLabel(juce::Graphics& g, juce::Label& label) override
     {
-        if (auto* slider = dynamic_cast<juce::Slider*>(label.getParentComponent()))
-        {
-            if (!slider->isMouseOverOrDragging())
-            {
-                // If not hovered, don't draw the label
-                return;
-            }
-        }
-        juce::Rectangle bounds = label.getLocalBounds();
-        bounds.setX(15);
-        bounds.setWidth(bounds.getWidth() -15);
 
-        g.setColour(juce::Colours::darkgrey);
-        g.fillRect(bounds);
-        g.setColour(juce::Colours::limegreen);
-        g.drawRect(bounds, 2.0f); // Border thickness of 2.0f
+
 
         // Draw the text
-        g.setColour(juce::Colours::white);
-        g.setFont(label.getFont());
-        g.drawText(label.getText(), bounds, juce::Justification::centred, true);
     }
 private:
     juce::Image mKnobStrip;
@@ -83,6 +76,14 @@ public:
 
         if (mToggleStrip.isNull())
             DBG("Failed to load toggle strip image from resources");
+    }
+
+    void setImage(const void* imageData, int imageDataSize)
+    {
+        mToggleStrip = juce::ImageFileFormat::loadFrom(imageData, imageDataSize);
+
+        if (mToggleStrip.isNull())
+            DBG("Failed to load image from binary data");
     }
 
     void drawToggleButton(juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton, bool isButtonDown) override

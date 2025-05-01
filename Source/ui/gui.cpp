@@ -7,10 +7,9 @@ int RootViewComponent::ROOT_HEIGHT = 550;
 
 RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     : AudioProcessorEditor(processor)
-    , mInputMeter(processor)
-    , mOutputMeter(processor,false)
-    , mFileChooser("choose NAM file")
+    , mProcessor(processor)
     , mTopBar(processor)
+    , mLeftSection(processor)
 {
     auto& gainProcessor = processor; 
 
@@ -22,52 +21,29 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     if (mImage.isNull())
         DBG("Failed to load image from resources");
 
-    setSize(ROOT_WIDTH,ROOT_HEIGHT);
+    setSize(mImage.getBounds().getWidth(), mImage.getBounds().getHeight());
     defineKnobLayout();
     configureNodes(gainProcessor);
 }
 
 RootViewComponent::~RootViewComponent()
 {
-	mInputKnob.setLookAndFeel(nullptr);
-	mGateKnob.setLookAndFeel(nullptr);
-	mBassKnob.setLookAndFeel(nullptr);
+	
 	mMidKnob.setLookAndFeel(nullptr);
-	mHighKnob.setLookAndFeel(nullptr);
-	mOutputKnob.setLookAndFeel(nullptr);
-	mVerbMixKnob.setLookAndFeel(nullptr);
-	mFileChooserButton.setLookAndFeel(nullptr);
-	mNAMChooserButton.setLookAndFeel(nullptr);
+
 }
 
 void RootViewComponent::setSliderAttachement(AudioProcessor& inProcessoe)
 {
     SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&inProcessoe);
-    mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
-    mBassKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "bass", mBassKnob);
-    mMidKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "mid", mMidKnob);
-    mHighKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "high", mHighKnob);
-    mOutputKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "output", mOutputKnob);
-    mGateKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "gate", mGateKnob);
-    mIRButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "irEnabled", mIRButton);
-    mNAMButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "namEnabled", mNAMButton);
-    mIRVerbButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "irVerbEnabled", mIRVerbButton);
-    mVerbMixKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        ampAudioProcessor->getCustomParameterTree(), "irVerbMix", mVerbMixKnob);
+  //  mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+    //    ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
+ 
 }
 
 void RootViewComponent::updatePath()
 {
-    SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&processor);
+   // SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&processor);
 
 }
 
