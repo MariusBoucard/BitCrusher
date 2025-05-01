@@ -129,6 +129,9 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
     }
 
 
+    auto param = mParameters.getParameterAsValue("radiationAmplitude").getValue();
+    auto param2 = mParameters.getParameterAsValue("radiationLength").getValue();
+    auto param3 = mParameters.getParameterAsValue("radiationFrequency").getValue();
 
     for (int channel = 0; channel < isMono; ++channel)
     {

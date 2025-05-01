@@ -10,6 +10,8 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     , mProcessor(processor)
     , mTopBar(processor)
     , mLeftSection(processor)
+    , mMidSection(processor)
+    , mRightSection(processor)
 {
     auto& gainProcessor = processor; 
 
@@ -29,22 +31,18 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
 RootViewComponent::~RootViewComponent()
 {
 	
-	mMidKnob.setLookAndFeel(nullptr);
 
 }
 
 void RootViewComponent::setSliderAttachement(AudioProcessor& inProcessoe)
 {
     SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&inProcessoe);
-  //  mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-    //    ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
+
  
 }
 
 void RootViewComponent::updatePath()
 {
-   // SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&processor);
-
 }
 
 void RootViewComponent::paint(juce::Graphics& g)

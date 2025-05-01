@@ -124,7 +124,19 @@ jucer_project_files("GainPlugin/Source/ui/components/leftSection"
   x         .         .         "Source/ui/components/leftSection/leftComponent.h"
 )
 
+jucer_project_files("GainPlugin/Source/ui/components/midSection"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/ui/components/midSection/midComponent.cpp"
+  x         .         .         "Source/ui/components/midSection/midComponent.h"
+)
 
+jucer_project_files("GainPlugin/Source/ui/components/rightSection"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/ui/components/rightSection/rightComponent.cpp"
+  x         .         .         "Source/ui/components/rightSection/rightComponent.h"
+)
 
 
 

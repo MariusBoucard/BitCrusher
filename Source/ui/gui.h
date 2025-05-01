@@ -3,7 +3,9 @@
 #include "../looknfeel/ToogleButtonLookAndFeel.h"
 #include "../looknfeel/TopBarLookAndFeel.h"
 #include "components/TopBarComponent.h"
+#include "components/midSection/midComponent.h"
 #include "components/leftSection/leftComponent.h"
+#include "components/rightSection/rightComponent.h"
 #include <JuceHeader.h>
 
 class RootViewComponent : public juce::AudioProcessorEditor
@@ -79,12 +81,16 @@ private:
     //MeterComponent mInputMeter;
     //KnobLayout mInputMeterLayout;
 
-    juce::Slider mMidKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mMidKnobAttachment;
-    KnobLayout mMidKnobLayout;
+
 
     LeftSection mLeftSection;
     KnobLayout mLeftSectionLayout;
+
+    MidSection mMidSection;
+    KnobLayout mMidSectionLayout;
+
+    RightSection mRightSection;
+    KnobLayout mRightSectionLayout;
 
     TopBarComponent mTopBar;
 

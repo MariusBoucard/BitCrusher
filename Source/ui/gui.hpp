@@ -10,44 +10,73 @@ void RootViewComponent::defineKnobLayout()
     mTopBarLayout.inLayout.textboxHeight = 0;
     mTopBarLayout.inLayout.textboxPadding = 0;
 
-    mMidKnobLayout.inLayout.x = 270;
-    mMidKnobLayout.inLayout.y = 504;
-    mMidKnobLayout.inLayout.frameWidth = 173;
-    mMidKnobLayout.inLayout.frameHeight = 181;
-    mMidKnobLayout.inLayout.ratio = 1.f;
-    mMidKnobLayout.inLayout.textboxHeight = 0;
-    mMidKnobLayout.inLayout.textboxPadding = 0;
+    mLeftSectionLayout.inLayout.x = 50;
+    mLeftSectionLayout.inLayout.y = 500;
+	mLeftSectionLayout.inLayout.frameWidth = 390;
+    mLeftSectionLayout.inLayout.frameHeight = 400;
+	mLeftSectionLayout.inLayout.ratio = 1.f;
+    mLeftSectionLayout.inLayout.textboxHeight = 0;
+    mLeftSectionLayout.inLayout.textboxPadding = 0;
 
-    computeKnobLayout(mMidKnobLayout);
+    mMidSectionLayout.inLayout.x = 500;
+    mMidSectionLayout.inLayout.y = 200;
+	mMidSectionLayout.inLayout.frameWidth = 900;
+    mMidSectionLayout.inLayout.frameHeight = 1000;
+	mMidSectionLayout.inLayout.ratio = 1.f;
+
+    mRightSectionLayout.inLayout.x = 1400;
+    mRightSectionLayout.inLayout.y = 200;
+    mRightSectionLayout.inLayout.frameWidth = 400;
+    mRightSectionLayout.inLayout.frameHeight = 500;
+    mRightSectionLayout.inLayout.ratio = 1.f;
+
+  
+
+    computeKnobLayout(mLeftSectionLayout);
     computeKnobLayout(mTopBarLayout);
+    computeKnobLayout(mMidSectionLayout);
+	computeKnobLayout(mRightSectionLayout);
 }
 
 
 void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
     auto bounds = getLocalBounds();
-    mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-   
 
     setSliderAttachement(inProcessor);
    
-    mMidKnob.setBounds(mMidKnobLayout.outLayout.x,
-        mMidKnobLayout.outLayout.y,
-        mMidKnobLayout.outLayout.sliderWidth,
-        mMidKnobLayout.outLayout.sliderHeight);
-  
+    
+    mLeftSection.setBounds(mLeftSectionLayout.outLayout.x,
+		mLeftSectionLayout.outLayout.y,
+		mLeftSectionLayout.outLayout.sliderWidth,
+		mLeftSectionLayout.outLayout.sliderHeight);
+    
+
     mTopBar.setBounds(mTopBarLayout.outLayout.x,
         mTopBarLayout.outLayout.y,
         mTopBarLayout.outLayout.sliderWidth,
         mTopBarLayout.outLayout.sliderHeight);
     
-    mMidKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+mMidSection.setBounds(mMidSectionLayout.outLayout.x,
+mMidSectionLayout.outLayout.y,
+mMidSectionLayout.outLayout.sliderWidth,
+mMidSectionLayout.outLayout.sliderHeight);
+
+	mRightSection.setBounds(mRightSectionLayout.outLayout.x,
+        		mRightSectionLayout.outLayout.y,
+        		mRightSectionLayout.outLayout.sliderWidth,
+        		mRightSectionLayout.outLayout.sliderHeight);
+	
+	addAndMakeVisible(mRightSection);
+	
+	addAndMakeVisible(mTopBar);
+
+addAndMakeVisible(mMidSection);
 
     
-    addAndMakeVisible(mMidKnob);
+    addAndMakeVisible(mLeftSection);
     
     addAndMakeVisible(mTopBar);
 
-    mMidKnob.setLookAndFeel(&mKnobLookAndFeel);
    
 }
