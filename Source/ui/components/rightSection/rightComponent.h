@@ -41,7 +41,7 @@ public:
     void paint(juce::Graphics& g) override
     {
         g.setColour(juce::Colours::black); // Set the color for the bounds
-        g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
+      //  g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
     }
 
     void setSliderAttachement(juce::AudioProcessor& inProcessor)
@@ -119,7 +119,7 @@ public:
 
     void configureNodes(juce::AudioProcessor& inProcessor)
 	{
-		mSatGainKnob.setSliderStyle(juce::Slider::Rotary);
+		mSatGainKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mSatGainKnob.setBounds(mSatGainKnobLayout.outLayout.x, mSatGainKnobLayout.outLayout.y, mSatGainKnobLayout.outLayout.sliderWidth, mSatGainKnobLayout.outLayout.sliderHeight);
 		addAndMakeVisible(mSatGainKnob);
 
@@ -128,7 +128,7 @@ public:
         look->setImage(BinaryData::satG_png, BinaryData::satG_pngSize);
         mSatGainKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
-        mSatMixKnob.setSliderStyle(juce::Slider::Rotary);
+        mSatMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mSatMixKnob.setBounds(mSatMixKnobLayout.outLayout.x, mSatMixKnobLayout.outLayout.y, mSatMixKnobLayout.outLayout.sliderWidth, mSatMixKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mSatMixKnob);
         mSatMixKnob.setLookAndFeel(new KnobLookAndFeel());
@@ -136,7 +136,7 @@ public:
         look2->setImage(BinaryData::SatM_png, BinaryData::SatM_pngSize);
         mSatMixKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
-        mBFKnob.setSliderStyle(juce::Slider::Rotary);
+        mBFKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mBFKnob.setBounds(mBFKnobLayout.outLayout.x, mBFKnobLayout.outLayout.y, mBFKnobLayout.outLayout.sliderWidth, mBFKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mBFKnob);
         mBFKnob.setLookAndFeel(new KnobLookAndFeel());
@@ -144,7 +144,7 @@ public:
         look3->setImage(BinaryData::SatBF_png, BinaryData::SatBF_pngSize);
         mBFKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
-        mBGKnob.setSliderStyle(juce::Slider::Rotary);
+        mBGKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mBGKnob.setBounds(mBGKnobLayout.outLayout.x, mBGKnobLayout.outLayout.y, mBGKnobLayout.outLayout.sliderWidth, mBGKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mBGKnob);
         mBGKnob.setLookAndFeel(new KnobLookAndFeel());
@@ -152,7 +152,7 @@ public:
         look4->setImage(BinaryData::SatBG_png, BinaryData::SatBG_pngSize);
         mBGKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
-        mBQGainKnob.setSliderStyle(juce::Slider::Rotary);
+        mBQGainKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mBQGainKnob.setBounds(mBQGainKnobLayout.outLayout.x, mBQGainKnobLayout.outLayout.y, mBQGainKnobLayout.outLayout.sliderWidth, mBQGainKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mBQGainKnob);
         mBQGainKnob.setLookAndFeel(new KnobLookAndFeel());
@@ -160,7 +160,7 @@ public:
         look5->setImage(BinaryData::SatBQ_png, BinaryData::SatBQ_pngSize);
         mBQGainKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         
-        mMixKnob.setSliderStyle(juce::Slider::Rotary);
+        mMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mMixKnob.setBounds(mMixKnobLayout.outLayout.x, mMixKnobLayout.outLayout.y, mMixKnobLayout.outLayout.sliderWidth, mMixKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mMixKnob);
         mMixKnob.setLookAndFeel(new KnobLookAndFeel());

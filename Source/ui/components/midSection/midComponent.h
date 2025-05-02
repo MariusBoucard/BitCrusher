@@ -41,7 +41,7 @@ public:
     void paint(juce::Graphics& g) override
     {
         g.setColour(juce::Colours::black); // Set the color for the bounds
-        g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
+    //    g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
     }
 
     void setSliderAttachement(juce::AudioProcessor& inProcessor)
@@ -94,7 +94,7 @@ public:
 
     void configureNodes(juce::AudioProcessor& inProcessor)
 	{
-		mBitKnob.setSliderStyle(juce::Slider::Rotary);
+		mBitKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 		mBitKnob.setBounds(mBitKnobLayout.outLayout.x, mBitKnobLayout.outLayout.y, mBitKnobLayout.outLayout.sliderWidth, mBitKnobLayout.outLayout.sliderHeight);
 		addAndMakeVisible(mBitKnob);
 
@@ -103,7 +103,7 @@ public:
         look->setImage(BinaryData::bit_png, BinaryData::bit_pngSize);
         mBitKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
-        mSRKnob.setSliderStyle(juce::Slider::Rotary);
+        mSRKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mSRKnob.setBounds(mSRKnobLayout.outLayout.x, mSRKnobLayout.outLayout.y, mSRKnobLayout.outLayout.sliderWidth, mSRKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mSRKnob);
 
@@ -112,7 +112,7 @@ public:
         look2->setImage(BinaryData::sr_png, BinaryData::sr_pngSize);
         mSRKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         
-        mRadKnob.setSliderStyle(juce::Slider::Rotary);
+        mRadKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         mRadKnob.setBounds(mRadKnobLayout.outLayout.x, mRadKnobLayout.outLayout.y, mRadKnobLayout.outLayout.sliderWidth, mRadKnobLayout.outLayout.sliderHeight);
         addAndMakeVisible(mRadKnob);
 

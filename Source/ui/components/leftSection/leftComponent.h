@@ -41,7 +41,7 @@ public:
     void paint(juce::Graphics& g) override
     {
         g.setColour(juce::Colours::black); // Set the color for the bounds
-        g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
+      //  g.drawRect(getLocalBounds(), 1);   // Draw the rectangle with a thickness of 1 pixel
     }
 
     void setSliderAttachement(juce::AudioProcessor& inProcessor)
@@ -96,15 +96,15 @@ public:
 
     void configureNodes(juce::AudioProcessor& inProcessor)
 	{
-		mHarmKnob.setSliderStyle(juce::Slider::Rotary);
+		mHarmKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 		mHarmKnob.setBounds(mHarmKnobLayout.outLayout.x, mHarmKnobLayout.outLayout.y, mHarmKnobLayout.outLayout.sliderWidth, mHarmKnobLayout.outLayout.sliderHeight);
 		addAndMakeVisible(mHarmKnob);
 
-		mTimeKnob.setSliderStyle(juce::Slider::Rotary);
+		mTimeKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 		mTimeKnob.setBounds(mTimeKnobLayout.outLayout.x, mTimeKnobLayout.outLayout.y, mTimeKnobLayout.outLayout.sliderWidth, mTimeKnobLayout.outLayout.sliderHeight);
 		addAndMakeVisible(mTimeKnob);
 
-		mDetectionKnob.setSliderStyle(juce::Slider::Rotary);
+		mDetectionKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 		mDetectionKnob.setBounds(mDetectionKnobLayout.outLayout.x, mDetectionKnobLayout.outLayout.y, mDetectionKnobLayout.outLayout.sliderWidth, mDetectionKnobLayout.outLayout.sliderHeight);
 		addAndMakeVisible(mDetectionKnob);
 

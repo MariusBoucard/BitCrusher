@@ -5,7 +5,8 @@
 #include "dsp/ImpulseResponse.h"
 #include "ParameterSetup.h"
 #include "Mappers.h"
-
+#include "dsp/RecursiveLinearFilter.h"
+#include <random>
 #include "Processor.hpp"
 //==============================================================================
 class SkeletonAudioProcessor final : public AudioProcessor
